@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 let helper = require("../config/helper");
+let validator = require("../middleware/validation")
 const db = require("../models");
 var randomstring = require("randomstring");
 const JWTDecode = require("jwt-decode");
@@ -97,7 +98,7 @@ module.exports = {
             profile.save();
     
             let fullName = req.body.role == 1 ? req.body.username : req.body.shop_name;
-            await helper.emailSend(req.body.email, fullName, createOtp);
+            // await helper.emailSend(req.body.email, fullName, createOtp);
     
             if (user) {
                 let accessToken = jwt.sign(
@@ -136,6 +137,8 @@ module.exports = {
             };
             const nonrequired = {};
             const requestedData = await helper.vaildObject(required, nonrequired);
+            validator.isValidEmail(requestedData.email)
+            console.log(requestedData.email,);
 
             var user = await User.findOne({
                 where: {
@@ -296,6 +299,10 @@ module.exports = {
         } catch (err) {
             helper.error(res, err);
         }
+    },
+    changePassword:async(req,res,next)=>{
+        
+
     },
     forgotpassword: async (req, res) => {
         try {

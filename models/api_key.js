@@ -36,7 +36,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'api_key',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",

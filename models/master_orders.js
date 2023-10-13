@@ -26,7 +26,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'master_orders',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",

@@ -69,7 +69,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'products',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",

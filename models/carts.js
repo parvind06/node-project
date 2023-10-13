@@ -26,7 +26,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'carts',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",

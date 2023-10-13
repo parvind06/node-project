@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('users', {
+  const User= sequelize.define('users', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER.UNSIGNED,
@@ -95,4 +95,13 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
+  User.prototype.toJSON = function () {
+    const values = { ...this.get() };
+    delete values.password;
+    delete values.otp;
+    delete values.otp_verify
+    delete values.customer_id
+    return values;
+  }
+  return User;
 };

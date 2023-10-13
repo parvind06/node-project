@@ -15,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'order_status',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",

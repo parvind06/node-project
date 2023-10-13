@@ -29,7 +29,6 @@ const limiter = rateLimit({
   max: 100, // Limit each IP to 100 requests per window
 });
 app.use('/api/', limiter);
-
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/users');
 

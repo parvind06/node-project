@@ -1,10 +1,12 @@
 var express = require('express');
 var AuthenticationController = require('../controller/AuthenticationController.js');
 const requireAuthentication = require("../passport").authenticateUser;
+// const validatedata = require("../middleware/validation.js").validateUserInput
 var router = express.Router();
 
-router.post('/log-in', AuthenticationController.logIn);
-router.post('/sign-up', AuthenticationController.signUp);
+
+router.post('/log-in',AuthenticationController.logIn);
+router.post('/sign-up',AuthenticationController.signUp);
 router.post('/refresh-token', AuthenticationController.refreshToken);
 router.post('/confirm-otp', AuthenticationController.confirmOtp);
 router.post('/resend-otp', AuthenticationController.resendOtp);

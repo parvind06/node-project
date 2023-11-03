@@ -1,0 +1,103 @@
+  GlobalSearch: async (req, res) => {
+    try {
+      const required = {};
+      const nonrequired = {
+        q: req.query.q,
+        category: req.query.cat_id,
+        price: req.query.price,
+        cbd: req.query.cbd,
+        thc: req.query.thc,
+        latitude: req.query.latitude,
+        longitude: req.query.longitude,
+      };
+      const requestedData = await helper.vaildObject(required, nonrequired);
+
+      let whereCondition = {};
+
+      if (Object.keys(requestedData).length === 0) {
+        whereCondition = {};
+      } else {
+        whereCondition = {
+          [Op.or]: [
+            { title: { [Op.like]: `%${requestedData.q}%` } },
+            { description: { [Op.like]: `%${requestedData.q}%` } },
+          ],
+        };
+
+        if (requestedData.category) {
+          whereCondition.cat_id = requestedData.category;
+        }
+
+        if (requestedData.price) {
+          const priceRange = requestedData.price.split("-");
+          const minPrice = parseFloat(priceRange[0]);
+          const maxPrice = parseFloat(priceRange[1]);
+
+          whereCondition.price = {
+            [Op.between]: [minPrice, maxPrice],
+          };
+        }
+
+        if (requestedData.latitude && requestedData.longitude) {
+          const lat = parseFloat(requestedData.latitude);
+          const lon = parseFloat(requestedData.longitude);
+          const radius = 5; // Define the radius for proximity search in kilometers
+
+          whereCondition["$vendor_storeData.shop_latitude$"] = {
+            [Op.between]: [lat - radius / 111, lat + radius / 111],
+          };
+
+          whereCondition["$vendor_storeData.shop_longitude$"] = {
+            [Op.between]: [
+              lon - radius / (111 * Math.cos((lat * Math.PI) / 180)),
+              lon + radius / (111 * Math.cos((lat * Math.PI) / 180)),
+            ],
+          };
+        }
+
+        if (requestedData.cbd) {
+          const cbdRange = requestedData.cbd.split("-");
+          const minCbd = parseFloat(cbdRange[0]);
+          const maxCbd = parseFloat(cbdRange[1]);
+          whereCondition.cbd = {
+            [Op.between]: [minCbd, maxCbd],
+          };
+        }
+
+        if (requestedData.thc) {
+          const thcRange = requestedData.thc.split("-");
+          const minThc = parseFloat(thcRange[0]);
+          const maxThc = parseFloat(thcRange[1]);
+          whereCondition.thc = {
+            [Op.between]: [minThc, maxThc],
+          };
+        }
+      }
+
+      const product = await Products.findAll({
+        attributes: {
+          include: [
+            [sequelize.literal(`(SELECT COUNT(id) FROM reviews WHERE  reviews.product_id = products.id )`), 'review_count'],
+            [sequelize.literal(`CASE WHEN (SELECT COUNT(id) FROM reviews WHERE reviews.product_id = products.id) = 0 THEN 0 ELSE (SELECT AVG(rating) FROM reviews WHERE reviews.product_id = products.id) END `), 'avg_rating']
+          ]
+        },
+        where: whereCondition,
+        include: [
+          {
+            model: Category
+          },
+          {
+            model: vendor_store,
+            as: "vendor_storeData",
+          },
+          {
+            model: ProductImages,
+          },
+        ],
+      });
+
+      return helper.success(res, "Search data found successfully", product);
+    } catch (err) {
+      return helper.error(res, err);
+    }
+  },
